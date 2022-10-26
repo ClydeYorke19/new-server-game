@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html>
+<body>
+    <div id="choosingToJoinOrCreate">
+        <h1 id="playerChoice">What do you want to do?</h1>
+        <br>
+        <button id="createGame">Create Game</button>
+        <br>
+        <br>
+        <button id="joinGame">Join Game</button>
+    </div>
+
+    <div id="ifPlayerIsCreating">
+        <h1 id="generatedCode"></h1>
+    </div>
+
+    <div id="ifPlayerIsJoining">
+        <label for="roomCode">What is the game code?</label>
+        <br>
+        <input type="text" placeholder="ENTER HERE" name="roomCode" id="roomCode">
+        <br>
+        <input id="playerEntersCode" type="button" value="ENTER">
+    </div>
+
+    <div id="testing">
+        <h1 id="testingH1"></h1>
+        <input type="button" value="ENTER" id="testingEnter">
+    </div>
+
+    <div id="testingPlayers">
+        <h2 id="player1Info"></h2>
+        <h2 id="player2Info"></h2>
+        <h2 id="player3Info"></h2>
+    </div>
+
+    <div id="playerJoiningInfo">
+        <label for="playerName">What is your name?</label>
+        <br>
+        <input type="text" id="playerName" name="playerName">
+        <br>
+        <label for="playerChips">How many chips are you playing with?</label>
+        <br>
+        <input tpye="number" id="playerChips" name="playerChips">
+        <br>
+        <button type="submit" id="playerInfoSubmit" value="ENTER">ENTER</button>
+    </div>
+
+<style>
+    #playerChoice {
+        font-size: 30px;
+        font-family: 'optima';
+        margin-left: 500px;
+    }
+    #createGame {
+        margin-left: 600px;
+    }
+    #joinGame {
+        margin-left: 605px;
+    }
+
+    #ifPlayerIsCreating {
+        display: none;
+    }
+
+    #ifPlayerIsJoining {
+        display: none;
+    }
+
+    #generatedCode {
+        text-align: center;
+        font-style: optima;
+        font-size: 20px;
+    }
+
+    #testing {
+        display: none;
+        border: 2px solid blue;
+    }
+
+    #playerJoiningInfo {
+        display: none;
+    }
+</style>
+<script src="/socket.io/socket.io.js"></script>
+<script>
+
+    var socket = io('http://localhost:3000/');
+
+    io.connect( "/" );
+
+    let roomCode;
+
+    const createGameH = document.getElementById('createGame');
+    const joinGameH = document.getElementById('joinGame');
+
+    const createOrJoin = document.getElementById('choosingToJoinOrCreate')
+    const playerCreating = document.getElementById('ifPlayerIsCreating');
+    const playerJoining = document.getElementById('ifPlayerIsJoining');
+
+    const generatedCode = document.getElementById('generatedCode');
+    const joiningAGameCode = document.getElementById('roomCode');
+
+    const playerEntersCode = document.getElementById('playerEntersCode');
+
+    const testingH1 = document.getElementById('testingH1');
+
+    const testing = document.getElementById('testing');
+
+    let testingEnter = document.getElementById('testingEnter');
+
+    const playerJoiningInfo = document.getElementById('playerJoiningInfo');
+    const playerName = document.getElementById('playerName');
+    const playerChips = document.getElementById('playerChips');
+    const playerInfoSubmit = document.getElementById('playerInfoSubmit');
+
+    let value;
+    let value2;
+
+    let num = 0;
+
+    testingH1.innerHTML = num;
+
+    let user1;
+
+    // let arr = [];
+
+    const creatingAGame = () => {
+        createOrJoin.style.display = 'none';
+        playerCreating.style.display = 'block';
+        socket.emit('newGame');
+    }
+    createGameH.addEventListener('click', creatingAGame);
+
+    socket.on('testEmit', (n) => {
+        generatedCode.innerHTML = `Your Game Code Is ${n}`;
+        value = n;
+    })
+
+    const joiningAGame = () => {
+        createOrJoin.style.display = 'none';
+        playerJoining.style.display = 'block';
+    }
+    joinGameH.addEventListener('click', joiningAGame);
+
+    const playerIsJoiningGame = () => {
+        // joiningAGameCodeValue = joiningAGameCode.value;
+        value2 = joiningAGameCode.value;
+        // playerJoiningInfo.style.display = 'block';
+        playerJoining.style.display = 'none';
+
+        socket.emit('joinGame', value2);
+
+        testing.style.display = 'block';
+        playerCreating.style.display = 'none';
+        playerJoining.style.display = 'none';
+    }
+    playerEntersCode.addEventListener('click', playerIsJoiningGame);
+
+    const initGame = () => {
+        testing.style.display = 'block';
+        playerCreating.style.display = 'none';
+        playerJoining.style.display = 'none';
+        // testingH1.innerHTML = num;
+    }
+
+    socket.on('testRoomEmit', initGame);
+
+    const testingElements = () => {
+        socket.emit('playerMove', value);
+    }
+
+    testingEnter.addEventListener('click', testingElements);
+
+    const testingPlayerM = (e) => {
+        console.log(e);
+        num += 10;
+        testingH1.innerHTML = num;
+        // socket.emit('playerMove');
+    }
+
+    socket.on('testingPlayerMoves', testingPlayerM);
+
+
+
+    ////////////////////////////////////////////////////
+    // OLD CODE //
+
+    // let testH1 = document.getElementById('testH1');
+
+    // socket.on('testEmit', (n) => {
+    //     testH1.innerHTML = n;
+    // })
+    // function createGame() {
+        
+    //     let generatedCode = '';
+
+    //     sessionStorage.setItem('game-Code', generatedCode);
+
+    //     // socket.emit('newGame', generatedCode);
+
+    //     window.location.href = 'page.html';
+
+    //     // window.location.href = 'testPage.html'
+    // }
+
+    // function joinGame() {
+    //     window.location.href = 'joinroom.html';
+    // }
+
+    // createGameH.addEventListener('click', createGame)
+    // joinGameH.addEventListener('click', joinGame);
+</script>
+</body>
+</html>
